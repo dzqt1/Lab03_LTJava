@@ -24,6 +24,9 @@ public class User {
     @Column()
     private LocalDateTime created_at;
 
+    @Column()
+    private boolean is_online;
+
 
     // Constructors, getters, and setters
 
@@ -75,5 +78,13 @@ public class User {
 
     public void setCreated_at(LocalDateTime created_at) {
         this.created_at = created_at;
+    }
+
+    public boolean is_online() {
+        return is_online;
+    }
+
+    public void setIs_online(boolean is_online) {
+        this.is_online = is_online;
     }
 }
