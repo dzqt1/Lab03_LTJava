@@ -1,44 +1,48 @@
 package com.solipsism.server.service;
 
-import java.util.List;
+import java.util.*;
+import com.solipsism.server.dao.UserDAO;
+import com.solipsism.server.model.User;
+import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
-import org.springframework.stereotype.Service;
-
-import com.solipsism.server.entity.User;
-import com.solipsism.server.repository.UserRepository;
-
-
-@Service
 public class UserService {
-    private final UserRepository userRepository;
+    private UserDAO userDAO;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public UserService() {
+        this.userDAO = new UserDAO();
     }
 
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userDAO.getUserByUsername(username);
     }
 
-    public void loginUser(User user) {
-        user.setIs_online(true);
-        userRepository.save(user);
-    }
-
-    public void logoutUser(User user) {
-        user.setIs_online(false);
-        user.setLast_seen(java.time.LocalDateTime.now());
-        userRepository.save(user);
-    }
-
-    public User createUser(User newUser) {
-        if (userRepository.findByUsername(newUser.getUsername()) != null) {
-            throw new IllegalArgumentException("Username already exists");
+    public User login(String username, String password) {
+        User user = userDAO.getUserByUsername(username);
+        if (user != null && user.getPassword().equals(password)) {
+            user.setIs_online(true);
+            user.setLast_seen(Timestamp.valueOf(LocalDateTime.now()));
+            userDAO.saveUser(user);
+            return user;
         }
-        return userRepository.save(newUser);
+        return null;
+    }
+
+    public boolean logout(String username) {
+        User user = userDAO.getUserByUsername(username);
+        if (user != null) {
+            user.setIs_online(false);
+            user.setLast_seen(Timestamp.valueOf(LocalDateTime.now()));
+            return userDAO.saveUser(user);
+        }
+        return false;
+    }
+
+    public boolean register(String username, String password) {
+        if (userDAO.getUserByUsername(username) != null) {
+            return false;
+        }
+        User newUser = new User(UUID.randomUUID(), username, password, Timestamp.valueOf(LocalDateTime.now()), Timestamp.valueOf(LocalDateTime.now()), false);
+        return userDAO.createUser(newUser);
     }
 }
