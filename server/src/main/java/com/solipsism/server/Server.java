@@ -5,8 +5,14 @@
 package com.solipsism.server;
 
 import java.net.ServerSocket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.sql.Timestamp;
 
+import com.solipsism.server.model.User;
 import com.solipsism.server.network.ClientHandler;
+import com.solipsism.server.service.UserService;
 
 /**
  *
