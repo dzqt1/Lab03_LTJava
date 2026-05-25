@@ -1,8 +1,9 @@
-package com.solipsism.server.model;
+package com.solipsism.shared.model;
 
 import java.util.UUID;
+import java.io.Serializable;
 
-public class DataPackage {
+public class DataPackage implements Serializable {
     private String type;
     private UUID sender;
     private UUID receiver;

@@ -4,7 +4,6 @@
  */
 package com.solipsism.client.view;
 
-import com.solipsism.client.api.UserApi;
 import com.solipsism.client.model.User;
 
 /**
@@ -14,7 +13,6 @@ import com.solipsism.client.model.User;
 public class MainView extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainView.class.getName());
-    private UserApi userApi;
     private User currentUser;
 
     /**

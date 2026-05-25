@@ -4,16 +4,15 @@
  */
 package com.solipsism.client.view;
 
-import com.solipsism.client.api.UserApi;
-import com.solipsism.client.model.User;
+import com.solipsism.client.service.AuthService;
+import java.util.UUID;
 
 /**
  *
  * @author Nhan Vo
  */
 public class Login extends javax.swing.JFrame {
-    
-    private final UserApi userApi = new UserApi("http://localhost:8080/api");
+    private AuthService authService;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
 
@@ -22,6 +21,38 @@ public class Login extends javax.swing.JFrame {
      */
     public Login() {
         initComponents();
+        authService = new AuthService();
+        authService.addListener(new AuthService.AuthListener() {
+            @Override
+            public void onLoginSuccess(UUID userId, String username) {
+                logger.info("Login successful");
+                java.awt.EventQueue.invokeLater(() -> {
+                    new MainView().setVisible(true);
+                    dispose();
+                });
+            }
+
+            @Override
+            public void onLoginFailure(String errorMessage) {
+                logger.warning("Login failed: " + errorMessage);
+                javax.swing.JOptionPane.showMessageDialog(Login.this, "Login failed: " + errorMessage, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
+            @Override
+            public void onConnectionClosed() {
+                logger.info("Connection closed");
+                javax.swing.JOptionPane.showMessageDialog(Login.this, "Connection to server lost. Please try again later.", "Connection Closed", javax.swing.JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+            }
+        });
+
+        try {
+            authService.connect("localhost", 8080);
+        } catch (Exception e) {
+            logger.log(java.util.logging.Level.SEVERE, "Failed to connect to server", e);
+            javax.swing.JOptionPane.showMessageDialog(this, "Failed to connect to server: " + e.getMessage(), "Connection Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
     }
 
     /**
@@ -117,17 +148,15 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_confirmButtonActionPerformed
     
     public void login() {
-        String username = usernameField.getText();
-        String password = passwordField.getText();
-        User user = userApi.login(username, password);
-        System.out.println("User from API: " + user);
-        if (user != null) {
-            logger.info("Login successful for user: " + user.getUsername());
-            // Proceed to the next screen or functionality
-        } else {
-            logger.warning("Login failed for username: " + username);
-            // Show error message to the user
+        String username = usernameField.getText().trim();
+        String password = passwordField.getText().trim();
+
+        if (username.isEmpty() || password.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please enter both username and password.", "Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
         }
+
+        authService.login(username, password);
     }
     
     /**

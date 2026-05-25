@@ -27,6 +27,28 @@ public class ConversationDAO {
         }
     }
 
+    public List<Conversation> getConversationsByUserId(UUID userId) {
+        List<Conversation> conversations = new ArrayList<>();
+        String sql = "SELECT c.* FROM conversations c JOIN conversation_participants cp ON c.id = cp.conversation_id WHERE cp.user_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                conversations.add(new Conversation(
+                    (UUID) rs.getObject("id"),
+                    rs.getString("name"),
+                    rs.getTimestamp("created_at"),
+                    (UUID) rs.getObject("created_by"),
+                    rs.getString("type")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return conversations;
+    }
+
     public Conversation getConversationById(UUID id) {
         String sql = "SELECT * FROM conversations WHERE id = ?";
         try (Connection conn = DBConnection.getConnection();
@@ -46,5 +68,19 @@ public class ConversationDAO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public boolean addParticipant(UUID conversationId, UUID userId) {
+        String sql = "INSERT INTO conversation_participants (user_id, conversation_id, joined_at) VALUES (?, ?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, userId);
+            stmt.setObject(2, conversationId);
+            stmt.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }
