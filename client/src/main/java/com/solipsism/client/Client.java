@@ -7,7 +7,9 @@ package com.solipsism.client;
 import java.io.*;
 import java.net.Socket;
 
-import com.solipsism.client.view.Login;
+import javax.security.auth.login.LoginContext;
+
+import com.solipsism.client.view.*;
 
 /**
  *

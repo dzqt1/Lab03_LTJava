@@ -38,6 +38,8 @@ public class ServerListener extends Thread {
         switch (type) {
             case NetworkProtocol.LOGIN_SUCCESS:
             case NetworkProtocol.LOGIN_FAILURE:
+            case NetworkProtocol.REGISTER_SUCCESS:
+            case NetworkProtocol.REGISTER_FAILURE:
                 callback.onMessageReceived(data);
                 break;
             default:

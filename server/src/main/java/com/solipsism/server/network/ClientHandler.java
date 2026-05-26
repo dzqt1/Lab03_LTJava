@@ -40,7 +40,9 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         } finally {
             try {
-                if (currentUser != null);
+                if (currentUser != null) {
+                    handleLogout();
+                }
                 if (in != null) in.close();
                 if (out != null) out.close();
                 if (socket != null) socket.close(); 
@@ -52,15 +54,54 @@ public class ClientHandler extends Thread {
 
     private void handlePackage(DataPackage dataPackage) {
         switch (dataPackage.getType()) {
-            case "LOGIN":
+            case NetworkProtocol.LOGIN:
                 handleLogin(dataPackage.getContent());
                 break;
-            case "LOGOUT":
-                System.out.println("Client requested logout");
+            case NetworkProtocol.LOGOUT:
+                handleLogout();
                 currentUser = null;
+                break;
+            case NetworkProtocol.REGISTER:
+                System.out.println("Client requested registration");
+                handleRegister(dataPackage.getContent());
                 break;
             default:
                 System.out.println("Unknown package type: " + dataPackage.getType());
+        }
+    }
+
+    // REGISTER //
+    private void handleRegister(String registerInfo) {
+        String[] parts = registerInfo.split(",");
+        if (parts.length != 2) {
+            DataPackage response = new DataPackage(
+                NetworkProtocol.REGISTER_FAILURE, 
+                null, 
+                null, 
+                "Invalid registration format. Expected: username,password"
+            );
+            sendPackage(response);
+            return;
+        }
+        String username = parts[0];
+        String password = parts[1];
+       
+        if (userService.register(username, password)) {
+            DataPackage response = new DataPackage(
+                NetworkProtocol.REGISTER_SUCCESS, 
+                null, 
+                null,
+                "Registration successful. You can now log in."
+            );
+            sendPackage(response);
+        } else {
+            DataPackage response = new DataPackage(
+                NetworkProtocol.REGISTER_FAILURE, 
+                null, 
+                null, 
+                "Username already exists"
+            );
+            sendPackage(response);
         }
     }
 
@@ -69,7 +110,7 @@ public class ClientHandler extends Thread {
         String[] parts = loginInfo.split(",");
         if (parts.length != 2) {
             DataPackage response = new DataPackage(
-                "LOGIN_FAILURE", 
+                NetworkProtocol.LOGIN_FAILURE, 
                 null, 
                 null, 
                 "Invalid login format. Expected: username,password"
@@ -83,7 +124,7 @@ public class ClientHandler extends Thread {
         if (user != null) {
             currentUser = user.getId();
             DataPackage response = new DataPackage(
-                "LOGIN_SUCCESS", 
+                NetworkProtocol.LOGIN_SUCCESS, 
                 null, 
                 null, 
                 user.getId() + "," + user.getUsername()
@@ -91,12 +132,22 @@ public class ClientHandler extends Thread {
             sendPackage(response);
         } else {
             DataPackage response = new DataPackage(
-                "LOGIN_FAILURE", 
+                NetworkProtocol.LOGIN_FAILURE, 
                 null, 
                 null, 
                 "Invalid username or password"
             );
             sendPackage(response);
+        }
+    }
+
+    // LOGOUT //
+    private void handleLogout() {
+        if (currentUser != null) {
+            User user = userService.getUserByUsername(currentUser.toString());
+            if (user != null) {
+                userService.logout(user.getUsername());
+            }
         }
     }
 

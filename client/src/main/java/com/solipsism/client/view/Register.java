@@ -3,45 +3,44 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.solipsism.client.view;
-
 import com.solipsism.client.service.AuthService;
-import java.util.UUID;
 
 /**
  *
  * @author Nhan Vo
  */
-public class Login extends javax.swing.JFrame {
+public class Register extends javax.swing.JFrame {
+    
     private AuthService authService;
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Register.class.getName());
 
     /**
-     * Creates new form Login
+     * Creates new form Register
      */
-    public Login() {
+    public Register() {
         initComponents();
         authService = new AuthService();
         authService.addListener(new AuthService.AuthListener() {
             @Override
-            public void onSuccess(UUID userId, String username) {
-                logger.info("Login successful");
+            public void onSuccess(java.util.UUID userId, String username) {
+                logger.info("Registration successful, now you can log in");
                 java.awt.EventQueue.invokeLater(() -> {
-                    new MainView().setVisible(true);
+                    new Login().setVisible(true);
                     dispose();
                 });
             }
 
             @Override
             public void onFailure(String errorMessage) {
-                logger.warning("Login failed: " + errorMessage);
-                javax.swing.JOptionPane.showMessageDialog(Login.this, "Login failed: " + errorMessage, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                logger.warning("Registration failed: " + errorMessage);
+                javax.swing.JOptionPane.showMessageDialog(Register.this, "Registration failed: " + errorMessage, "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
 
             @Override
             public void onConnectionClosed() {
                 logger.info("Connection closed");
-                javax.swing.JOptionPane.showMessageDialog(Login.this, "Connection to server lost. Please try again later.", "Connection Closed", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(Register.this, "Connection to server lost. Please try again later.", "Connection Closed", javax.swing.JOptionPane.ERROR_MESSAGE);
                 System.exit(0);
             }
         });
@@ -53,6 +52,7 @@ public class Login extends javax.swing.JFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Failed to connect to server: " + e.getMessage(), "Connection Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
+
     }
 
     /**
@@ -69,12 +69,14 @@ public class Login extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         usernameField = new javax.swing.JTextField();
         passwordField = new javax.swing.JTextField();
+        toSignIn = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        passwordField1 = new javax.swing.JTextField();
         confirmButton = new javax.swing.JButton();
-        toSignUp = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText("Sign In");
+        jLabel1.setText("Sign up");
 
         jLabel2.setText("Username");
 
@@ -87,11 +89,15 @@ public class Login extends javax.swing.JFrame {
 
         passwordField.addActionListener(this::passwordFieldActionPerformed);
 
+        toSignIn.setText("Sign in");
+        toSignIn.addActionListener(this::toSignInActionPerformed);
+
+        jLabel4.setText("Confirm password");
+
+        passwordField1.addActionListener(this::passwordField1ActionPerformed);
+
         confirmButton.setText("Confirm");
         confirmButton.addActionListener(this::confirmButtonActionPerformed);
-
-        toSignUp.setText("Sign Up");
-        toSignUp.addActionListener(this::toSignUpActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -105,20 +111,20 @@ public class Login extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(82, 82, 82)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(passwordField))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(passwordField)
+                            .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(passwordField1, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(155, 155, 155)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(toSignUp)
-                            .addComponent(confirmButton))))
-                .addContainerGap(113, Short.MAX_VALUE))
+                        .addGap(159, 159, 159)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(confirmButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(toSignIn, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                .addContainerGap(87, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -127,17 +133,21 @@ public class Login extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(usernameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(passwordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                 .addComponent(confirmButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(toSignUp)
-                .addContainerGap(98, Short.MAX_VALUE))
+                .addComponent(toSignIn)
+                .addGap(53, 53, 53))
         );
 
         pack();
@@ -151,27 +161,37 @@ public class Login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_passwordFieldActionPerformed
 
-    private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
-        login();
-    }//GEN-LAST:event_confirmButtonActionPerformed
-
-    private void toSignUpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toSignUpActionPerformed
+    private void toSignInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_toSignInActionPerformed
         java.awt.EventQueue.invokeLater(() -> {
-            new Register().setVisible(true);
+            new Login().setVisible(true);
             dispose();
         });
-    }//GEN-LAST:event_toSignUpActionPerformed
+    }//GEN-LAST:event_toSignInActionPerformed
+
+    private void passwordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passwordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_passwordField1ActionPerformed
+
+    private void confirmButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_confirmButtonActionPerformed
+        register();
+    }//GEN-LAST:event_confirmButtonActionPerformed
     
-    public void login() {
+    private void register() {
         String username = usernameField.getText().trim();
         String password = passwordField.getText().trim();
+        String confirmPassword = passwordField1.getText().trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Please enter both username and password.", "Input Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Please fill in all fields.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        authService.login(username, password);
+        if (!password.equals(confirmPassword)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Passwords do not match.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        authService.register(username, password);
     }
     
     /**
@@ -196,7 +216,7 @@ public class Login extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() -> new Login().setVisible(true));
+        java.awt.EventQueue.invokeLater(() -> new Register().setVisible(true));
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -204,8 +224,10 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JTextField passwordField;
-    private javax.swing.JButton toSignUp;
+    private javax.swing.JTextField passwordField1;
+    private javax.swing.JButton toSignIn;
     private javax.swing.JTextField usernameField;
     // End of variables declaration//GEN-END:variables
 }
