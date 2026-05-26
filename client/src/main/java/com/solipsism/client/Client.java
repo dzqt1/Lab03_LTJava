@@ -19,7 +19,7 @@ public class Client {
 
     public Client() {
         java.awt.EventQueue.invokeLater(() -> {
-            new Login().setVisible(true);
+            new MainView().setVisible(true);
         });
     }
     
