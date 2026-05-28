@@ -83,4 +83,16 @@ public class ConversationDAO {
             return false;
         }
     }
+
+    public boolean removeConversation(UUID conversationId) {
+        String sql = "DELETE FROM conversations WHERE id = ?";
+        try (Connection conn = DBConnection.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setObject(1, conversationId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

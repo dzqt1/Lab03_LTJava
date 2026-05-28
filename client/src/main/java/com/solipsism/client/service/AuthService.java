@@ -81,14 +81,32 @@ public class AuthService implements MessageListener {
     }
 
     public void logout() {
-        UUID userId = SessionService.getInstance().getCurrentUserId();
-        DataPackage logoutPackage = new DataPackage(NetworkProtocol.LOGOUT, null, userId, null);
         try {
-            clientSocket.sendPackage(logoutPackage);
+            UUID userId = SessionService.getInstance().getCurrentUserId();
+            
+            if (clientSocket != null) {
+                DataPackage logoutPackage = new DataPackage(NetworkProtocol.LOGOUT, null, userId, null);
+                try {
+                    clientSocket.sendPackage(logoutPackage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (serverListener != null) {
+                serverListener.stopListening();
+            }
+
+            if (clientSocket != null) {
+                try {
+                    clientSocket.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             SessionService.getInstance().logout();
-            serverListener.stopListening();
-            clientSocket.disconnect();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
